@@ -1,6 +1,6 @@
 ﻿/*
 Created: 13.03.2018
-Modified: 13.03.2018
+Modified: 14.03.2018
 Model: RealtorAssist (SQLite3 database model)
 Database: SQLite 3.7
 */
@@ -19,26 +19,6 @@ CREATE TABLE Client
   Email TEXT NOT NULL
 );
 
--- Table Deal_members
-
-CREATE TABLE Deal_members
-(
-  Deal_members_id INTEGER NOT NULL
-        CONSTRAINT Deal_members_key PRIMARY KEY AUTOINCREMENT,
-  Client_id INTEGER NOT NULL,
-  Client_role_id INTEGER NOT NULL,
-  Deal_id INTEGER NOT NULL,
-  CONSTRAINT Memberhips FOREIGN KEY (Client_id) REFERENCES Client (Client_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT Defines_client_role FOREIGN KEY (Client_role_id) REFERENCES Client_role (Client_role_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT Create FOREIGN KEY (Deal_id) REFERENCES Deal (Deal_id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-CREATE INDEX IX_Create ON Deal_members (Deal_id);
-
-CREATE INDEX IX_Defines_client_role ON Deal_members (Client_role_id);
-
-CREATE INDEX IX_Memberhips ON Deal_members (Client_id);
-
 -- Table Client_role
 
 CREATE TABLE Client_role
@@ -46,6 +26,21 @@ CREATE TABLE Client_role
   Client_role_id INTEGER NOT NULL
         CONSTRAINT Client_role_key PRIMARY KEY AUTOINCREMENT,
   Name TEXT NOT NULL
+);
+
+-- Table Object
+
+CREATE TABLE Object
+(
+  Object_id INTEGER NOT NULL
+        CONSTRAINT Object_key PRIMARY KEY AUTOINCREMENT,
+  Street TEXT NOT NULL,
+  House TEXT NOT NULL,
+  Flat TEXT NOT NULL,
+  Rooms INTEGER NOT NULL,
+  Area REAL NOT NULL,
+  Desired_price REAL NOT NULL,
+  Minimum_price REAL NOT NULL
 );
 
 -- Table Deal
@@ -64,20 +59,25 @@ CREATE TABLE Deal
 
 CREATE INDEX IX_For_sale ON Deal (Object_id);
 
--- Table Object
+-- Table Deal_members
 
-CREATE TABLE Object
+CREATE TABLE Deal_members
 (
-  Object_id INTEGER NOT NULL
-        CONSTRAINT Object_key PRIMARY KEY AUTOINCREMENT,
-  Street TEXT NOT NULL,
-  House TEXT NOT NULL,
-  Flat TEXT NOT NULL,
-  Rooms INTEGER NOT NULL,
-  Area REAL NOT NULL,
-  Desired_price REAL NOT NULL,
-  Minimum_price REAL NOT NULL
+  Deal_members_id INTEGER NOT NULL
+        CONSTRAINT Deal_members_key PRIMARY KEY AUTOINCREMENT,
+  Client_id INTEGER NOT NULL,
+  Client_role_id INTEGER NOT NULL,
+  Deal_id INTEGER NOT NULL,
+  CONSTRAINT Memberhips FOREIGN KEY (Client_id) REFERENCES Client (Client_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT Defines_client_role FOREIGN KEY (Client_role_id) REFERENCES Client_role (Client_role_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT Sign FOREIGN KEY (Deal_id) REFERENCES Deal (Deal_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+CREATE INDEX IX_Defines_client_role ON Deal_members (Client_role_id);
+
+CREATE INDEX IX_Memberhips ON Deal_members (Client_id);
+
+CREATE INDEX IX_Sign ON Deal_members (Deal_id);
 
 -- Table Event
 
@@ -95,6 +95,15 @@ CREATE TABLE Event
 
 CREATE INDEX IX_Contains_in ON Event (Deal_id);
 
+-- Table Stage
+
+CREATE TABLE Stage
+(
+  Stage_id INTEGER NOT NULL
+        CONSTRAINT Stage_key PRIMARY KEY AUTOINCREMENT,
+  Name TEXT NOT NULL
+);
+
 -- Table Step
 
 CREATE TABLE Step
@@ -111,15 +120,6 @@ CREATE TABLE Step
 CREATE INDEX IX_Names ON Step (Stage_id);
 
 CREATE INDEX IX_Passes ON Step (Deal_id);
-
--- Table Stage
-
-CREATE TABLE Stage
-(
-  Stage_id INTEGER NOT NULL
-        CONSTRAINT Stage_key PRIMARY KEY AUTOINCREMENT,
-  Name TEXT NOT NULL
-);
 
 -- Table Note
 
